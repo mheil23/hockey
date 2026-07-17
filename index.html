@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏒 Ball Hockey Formations</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary-bg: #1a1a2e;
+      --secondary-bg: #16213e;
+      --accent-border: #0f3460;
+      --text-color: #f0f0f0;
+      --rink-surface: #5c6b7a;
+      --own-token: #4a90d9;
+      --opp-token: #d94a4a;
+      --ball-color: #f5a623;
+    }
+
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Toolbar Header */
+    .toolbar {
+      background-color: var(--secondary-bg);
+      border-bottom: 1px solid var(--accent-border);
+      padding: 0.75rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .toolbar-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar label {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      white-space: nowrap;
+    }
+
+    .toolbar select,
+    .toolbar button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.6rem;
+      border: 1px solid var(--accent-border);
+      border-radius: 4px;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .toolbar select:focus,
+    .toolbar button:focus {
+      outline: 2px solid #4a90d9;
+      outline-offset: 2px;
+    }
+
+    .toolbar button.active {
+      background-color: var(--accent-border);
+      border-color: #4a90d9;
+    }
+
+    .toolbar .toggle-btn {
+      position: relative;
+    }
+
+    .toolbar .toggle-btn[aria-pressed="true"] {
+      background-color: var(--accent-border);
+      border-color: #4a90d9;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .rink-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      min-width: 0;
+    }
+
+    #rink {
+      width: 100%;
+      max-width: 900px;
+      height: auto;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Description Panel (Desktop - Side) */
+    .description-panel {
+      width: 300px;
+      background-color: var(--secondary-bg);
+      border-left: 1px solid var(--accent-border);
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: none;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .description-panel.visible {
+      display: flex;
+    }
+
+    .description-panel h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .description-panel p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    .description-panel .attributes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .description-panel .attribute-tag {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      background-color: var(--accent-border);
+      border-radius: 3px;
+    }
+
+    .description-panel .close-btn {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 0.25rem;
+      min-height: 44px;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Notification Area */
+    .notification-area {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .notification {
+      margin-top: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      pointer-events: auto;
+      animation: slideDown 0.3s ease;
+      max-width: 90%;
+    }
+
+    .notification.info {
+      background-color: #1e3a5f;
+      border: 1px solid #4a90d9;
+    }
+
+    .notification.error {
+      background-color: #5f1e1e;
+      border: 1px solid #d94a4a;
+    }
+
+    .notification.warning {
+      background-color: #5f4a1e;
+      border: 1px solid #f5a623;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Confirmation Dialog */
+    .confirm-dialog {
+      background-color: var(--secondary-bg);
+      border: 1px solid var(--accent-border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      color: var(--text-color);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .confirm-dialog::backdrop {
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .confirm-dialog p {
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .confirm-dialog .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    .confirm-dialog button {
+      font-family: inherit;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid var(--accent-border);
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .confirm-dialog .btn-cancel {
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+    }
+
+    .confirm-dialog .btn-confirm {
+      background-color: #d94a4a;
+      color: #fff;
+      border-color: #d94a4a;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 767px) {
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .toolbar-group {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .toolbar select,
+      .toolbar button {
+        min-height: 44px;
+        min-width: 44px;
+        font-size: 0.9rem;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .main-content {
+        flex-direction: column;
+      }
+
+      .rink-container {
+        padding: 0.5rem;
+        width: 100%;
+      }
+
+      #rink {
+        max-width: 100%;
+        width: 100%;
+        height: auto;
+      }
+
+      /* Description Panel as Bottom Sheet on Mobile */
+      .description-panel {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 50vh;
+        border-left: none;
+        border-top: 1px solid var(--accent-border);
+        border-radius: 12px 12px 0 0;
+        z-index: 500;
+        padding: 1rem;
+      }
+
+      .description-panel .close-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Toolbar Header -->
+  <header class="toolbar" role="toolbar" aria-label="Formation controls">
+    <span class="toolbar-title">🏒 Ball Hockey Formations</span>
+
+    <!-- Opponent Overlay -->
+    <div class="toolbar-group">
+      <button id="opponent-toggle" class="toggle-btn" type="button" aria-pressed="false" aria-label="Toggle opponent overlay">Opponent</button>
+    </div>
+
+    <!-- Moments -->
+    <div class="toolbar-group">
+      <label for="moment-select">Moment:</label>
+      <select id="moment-select" aria-label="Situational moment">
+        <option value="">— Select Moment —</option>
+      </select>
+      <button id="moment-save-btn" type="button" aria-label="Save current arrangement as moment" style="display:none">Save</button>
+      <button id="moment-delete-btn" type="button" aria-label="Delete selected saved moment" style="display:none">Delete</button>
+    </div>
+
+    <!-- Draw Mode -->
+    <div class="toolbar-group">
+      <button id="draw-mode-toggle" class="toggle-btn" type="button" aria-pressed="false" aria-label="Toggle draw mode">Draw</button>
+      <button id="clear-arrows-btn" type="button" aria-label="Clear all arrows" style="display:none">Clear Arrows</button>
+    </div>
+
+    <!-- Reset and Export -->
+    <div class="toolbar-group">
+      <button id="reset-btn" type="button" aria-label="Reset rink to default positions">Reset</button>
+      <button id="export-btn" type="button" aria-label="Export rink as PNG image">Export PNG</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Rink Container -->
+    <div class="rink-container">
+      <svg id="rink" viewBox="0 0 200 85" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ball hockey rink with player formations">
+        <!-- Layered groups for rendering -->
+        <g id="rink-markings"></g>
+        <g id="arrows-layer"></g>
+        <g id="tokens-layer"></g>
+        <g id="ball-layer"></g>
+      </svg>
+    </div>
+
+    <!-- Description Panel (side panel on desktop, bottom sheet on mobile) -->
+    <aside class="description-panel" id="description-panel" aria-label="Position description" role="complementary">
+      <button class="close-btn" id="description-close-btn" aria-label="Close description panel">&times;</button>
+      <h2 id="description-title"></h2>
+      <p id="description-role"></p>
+      <div class="attributes" id="description-attributes"></div>
+      <p id="description-responsibilities"></p>
+    </aside>
+  </main>
+
+  <!-- Notification Area -->
+  <div class="notification-area" id="notification-area" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Confirmation Dialog -->
+  <dialog class="confirm-dialog" id="confirm-dialog">
+    <p id="confirm-dialog-message"></p>
+    <div class="dialog-actions">
+      <button class="btn-cancel" id="confirm-dialog-cancel" type="button">Cancel</button>
+      <button class="btn-confirm" id="confirm-dialog-confirm" type="button">Confirm</button>
+    </div>
+  </dialog>
+
+  <!-- ES Module Entry Point -->
+  <script type="module" src="src/controller.js"></script>
+</body>
+</html>
