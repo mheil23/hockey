@@ -13,12 +13,12 @@ const RINK_HEIGHT = 85;
 const OWN_TOKEN_FILL = "#4a90d9";
 const OPP_TOKEN_FILL = "#d94a4a";
 const TOKEN_LABEL_FILL = "#ffffff";
-const TOKEN_RADIUS = 3.5; // ~3.5% of 200 width = 7 diameter
-const TOKEN_FONT_SIZE = 3;
+const TOKEN_RADIUS = 4.55; // 30% larger than 3.5
+const TOKEN_FONT_SIZE = 3.9;
 
 // Ball styling
 const BALL_FILL = "#000000";
-const BALL_RADIUS = 2.2;
+const BALL_RADIUS = 2.86; // 30% larger than 2.2
 
 // Arrow styling
 const ARROW_COLOR = "#000000";
