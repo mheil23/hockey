@@ -348,20 +348,19 @@
       }
 
       .rink-container {
-        padding: 0;
+        padding: 0.5rem;
         width: 100%;
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: center;
-        overflow-y: auto;
-        overflow-x: hidden;
+        overflow: hidden;
       }
 
       #rink {
-        width: 100vw;
-        height: calc(100vw * 200 / 85);
-        max-width: none;
-        max-height: none;
+        width: auto;
+        height: calc(100vh - 60px);
+        max-width: 100%;
+        max-height: calc(100vh - 60px);
       }
 
       /* Description Panel as Bottom Sheet on Mobile */
