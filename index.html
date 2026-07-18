@@ -358,21 +358,10 @@
       }
 
       #rink {
-        /* After 90deg rotation: visual width = original height, visual height = original width
-           We want the visual width (original height) to fill viewport width.
-           So set the SVG width to 100vw, which after rotation becomes the visual height.
-           Set height to 100vw so that after rotation it becomes the visual width (fills screen). */
-        width: calc(100vw * 200 / 85);
-        height: 100vw;
+        width: 100vw;
+        height: calc(100vw * 200 / 85);
         max-width: none;
         max-height: none;
-        transform: rotate(90deg) translateX(0);
-        transform-origin: center center;
-        margin: calc((100vw * 200 / 85 - 100vw) / 2) 0;
-      }
-
-      #rink text {
-        transform: none;
       }
 
       /* Description Panel as Bottom Sheet on Mobile */
@@ -478,6 +467,45 @@
       this.setAttribute("aria-expanded", String(expanded));
       this.textContent = expanded ? "✕" : "☰";
     });
+
+    // On mobile, switch SVG to portrait viewBox for correct touch handling
+    function setupMobileRink() {
+      const rink = document.getElementById("rink");
+      if (!rink) return;
+      const mq = window.matchMedia("(max-width: 767px)");
+      function update(e) {
+        if (e.matches) {
+          // Portrait: swap viewBox to 85 wide x 200 tall, add a transform to rotate content
+          rink.setAttribute("viewBox", "0 0 85 200");
+          // Add a rotation group that maps the 200x85 content into the 85x200 viewport
+          let rotGroup = rink.querySelector("#mobile-rotate-group");
+          if (!rotGroup) {
+            rotGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            rotGroup.id = "mobile-rotate-group";
+            rotGroup.setAttribute("transform", "translate(85, 0) rotate(90)");
+            // Move all existing children into the rotation group
+            while (rink.firstChild) {
+              rotGroup.appendChild(rink.firstChild);
+            }
+            rink.appendChild(rotGroup);
+          }
+        } else {
+          // Desktop: restore landscape viewBox
+          rink.setAttribute("viewBox", "0 0 200 85");
+          const rotGroup = rink.querySelector("#mobile-rotate-group");
+          if (rotGroup) {
+            // Move children back out
+            while (rotGroup.firstChild) {
+              rink.appendChild(rotGroup.firstChild);
+            }
+            rotGroup.remove();
+          }
+        }
+      }
+      mq.addEventListener("change", update);
+      update(mq);
+    }
+    setupMobileRink();
   </script>
 
   <!-- ES Module Entry Point -->
