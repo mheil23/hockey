@@ -136,17 +136,20 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      padding: 0.5rem;
       min-width: 0;
+      overflow: hidden;
     }
 
     #rink {
       width: 100%;
-      max-width: 900px;
-      height: auto;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
+      object-fit: contain;
     }
 
     /* Description Panel (Desktop - Side) */
@@ -344,18 +347,20 @@
       }
 
       .rink-container {
-        padding: 0.5rem;
+        padding: 0;
         width: 100%;
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
       }
 
       #rink {
-        max-width: 100%;
-        width: auto;
+        width: 95vh;
+        max-width: 95vh;
         height: auto;
-        max-height: 70vh;
+        max-height: 100vw;
         transform: rotate(90deg);
         transform-origin: center center;
       }
