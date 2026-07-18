@@ -299,12 +299,18 @@
       .rink-container {
         padding: 0.5rem;
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       #rink {
         max-width: 100%;
-        width: 100%;
+        width: auto;
         height: auto;
+        max-height: 70vh;
+        transform: rotate(90deg);
+        transform-origin: center center;
       }
 
       /* Description Panel as Bottom Sheet on Mobile */
