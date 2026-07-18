@@ -18,38 +18,28 @@ const RINK_HEIGHT = 85;
 
 /**
  * Converts a pointer event's client coordinates to SVG viewBox coordinates.
- * Uses getBoundingClientRect + viewBox to handle CSS transforms (rotation) correctly.
+ * getScreenCTM() includes CSS transforms (rotation), so this works on mobile.
  * @param {SVGSVGElement} svgEl - The root SVG element
  * @param {PointerEvent} e - The pointer event
  * @returns {{ x: number, y: number }} SVG-space coordinates
  */
 function clientToSVG(svgEl, e) {
-  // Try getScreenCTM first (works when no CSS transforms interfere)
   const ctm = svgEl.getScreenCTM();
   if (ctm) {
     const pt = svgEl.createSVGPoint();
     pt.x = e.clientX;
     pt.y = e.clientY;
     const svgPt = pt.matrixTransform(ctm.inverse());
-    // Sanity check: if the result is wildly outside the viewBox, fall back
-    if (svgPt.x >= -10 && svgPt.x <= RINK_WIDTH + 10 &&
-        svgPt.y >= -10 && svgPt.y <= RINK_HEIGHT + 10) {
-      return { x: svgPt.x, y: svgPt.y };
-    }
+    return { x: svgPt.x, y: svgPt.y };
   }
 
-  // Fallback: manual calculation using bounding rect
+  // Fallback only if getScreenCTM is unavailable
   const rect = svgEl.getBoundingClientRect();
   const viewBox = svgEl.viewBox && svgEl.viewBox.baseVal;
   const vbW = (viewBox && viewBox.width) || RINK_WIDTH;
   const vbH = (viewBox && viewBox.height) || RINK_HEIGHT;
-
-  const scaleX = vbW / rect.width;
-  const scaleY = vbH / rect.height;
-
-  const x = (e.clientX - rect.left) * scaleX;
-  const y = (e.clientY - rect.top) * scaleY;
-
+  const x = (e.clientX - rect.left) * (vbW / rect.width);
+  const y = (e.clientY - rect.top) * (vbH / rect.height);
   return { x, y };
 }
 
