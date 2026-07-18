@@ -10,8 +10,8 @@ const RINK_WIDTH = 200;
 const RINK_HEIGHT = 85;
 
 // Token styling
-const OWN_TOKEN_FILL = "#4a90d9";
-const OPP_TOKEN_FILL = "#d94a4a";
+const OWN_TOKEN_FILL = "#f5820b";
+const OPP_TOKEN_FILL = "#2e8b57";
 const TOKEN_LABEL_FILL = "#ffffff";
 const TOKEN_RADIUS = 4.55; // 30% larger than 3.5
 const TOKEN_FONT_SIZE = 3.9;
