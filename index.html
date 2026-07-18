@@ -344,25 +344,31 @@
 
       .main-content {
         flex-direction: column;
+        overflow: visible;
       }
 
       .rink-container {
         padding: 0;
         width: 100%;
-        flex: 1;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       #rink {
-        width: 95vh;
-        max-width: 95vh;
-        height: auto;
-        max-height: 100vw;
-        transform: rotate(90deg);
+        /* After 90deg rotation: visual width = original height, visual height = original width
+           We want the visual width (original height) to fill viewport width.
+           So set the SVG width to 100vw, which after rotation becomes the visual height.
+           Set height to 100vw so that after rotation it becomes the visual width (fills screen). */
+        width: calc(100vw * 200 / 85);
+        height: 100vw;
+        max-width: none;
+        max-height: none;
+        transform: rotate(90deg) translateX(0);
         transform-origin: center center;
+        margin: calc((100vw * 200 / 85 - 100vw) / 2) 0;
       }
 
       #rink text {
