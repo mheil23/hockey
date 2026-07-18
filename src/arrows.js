@@ -33,15 +33,26 @@ const MIN_ARROW_LENGTH = 0.02;
  * Converts a pointer event's client coordinates to SVG viewBox coordinates.
  */
 function clientToSVG(svgEl, e) {
-  const pt = svgEl.createSVGPoint();
-  pt.x = e.clientX;
-  pt.y = e.clientY;
   const ctm = svgEl.getScreenCTM();
-  if (!ctm) {
-    return { x: 0, y: 0 };
+  if (ctm) {
+    const pt = svgEl.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgPt = pt.matrixTransform(ctm.inverse());
+    if (svgPt.x >= -10 && svgPt.x <= RINK_WIDTH + 10 &&
+        svgPt.y >= -10 && svgPt.y <= RINK_HEIGHT + 10) {
+      return { x: svgPt.x, y: svgPt.y };
+    }
   }
-  const svgPt = pt.matrixTransform(ctm.inverse());
-  return { x: svgPt.x, y: svgPt.y };
+
+  // Fallback for CSS-rotated SVG
+  const rect = svgEl.getBoundingClientRect();
+  const viewBox = svgEl.viewBox && svgEl.viewBox.baseVal;
+  const vbW = (viewBox && viewBox.width) || RINK_WIDTH;
+  const vbH = (viewBox && viewBox.height) || RINK_HEIGHT;
+  const x = (e.clientX - rect.left) * (vbW / rect.width);
+  const y = (e.clientY - rect.top) * (vbH / rect.height);
+  return { x, y };
 }
 
 /**
