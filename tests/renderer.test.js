@@ -271,7 +271,7 @@ describe("renderTokens", () => {
     const layer = svg.querySelector("#tokens-layer");
     const circles = layer.querySelectorAll("circle");
     expect(circles).toHaveLength(1);
-    expect(circles[0].getAttribute("fill")).toBe("#4a90d9");
+    expect(circles[0].getAttribute("fill")).toBe("#2e8b57");
   });
 
   it("renders opponent tokens as red circles", () => {
@@ -283,7 +283,7 @@ describe("renderTokens", () => {
     const layer = svg.querySelector("#tokens-layer");
     const circles = layer.querySelectorAll("circle");
     expect(circles).toHaveLength(1);
-    expect(circles[0].getAttribute("fill")).toBe("#d94a4a");
+    expect(circles[0].getAttribute("fill")).toBe("#f5820b");
   });
 
   it("renders labels centered in tokens", () => {
@@ -404,7 +404,7 @@ describe("renderBall", () => {
     const circle = svg.querySelector("#ball-layer circle");
     const ballRadius = parseFloat(circle.getAttribute("r"));
     // Ball radius (0.5) should be smaller than token radius (0.77)
-    expect(ballRadius).toBeLessThan(3.5);
+    expect(ballRadius).toBeLessThan(4.55);
   });
 
   it("positions ball at correct SVG coordinates", () => {
@@ -436,8 +436,8 @@ describe("renderBall", () => {
 
     const circle = svg.querySelector("#ball-layer circle");
     const fill = circle.getAttribute("fill");
-    expect(fill).not.toBe("#4a90d9"); // not blue (own)
-    expect(fill).not.toBe("#d94a4a"); // not red (opponent)
+    expect(fill).not.toBe("#2e8b57"); // not green (own)
+    expect(fill).not.toBe("#f5820b"); // not orange (opponent)
   });
 });
 
