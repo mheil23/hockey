@@ -18,13 +18,16 @@ const RINK_HEIGHT = 85;
 
 /**
  * Converts a pointer event's client coordinates to SVG viewBox coordinates.
- * getScreenCTM() includes CSS transforms (rotation), so this works on mobile.
+ * Uses getScreenCTM on a content layer to properly account for any
+ * SVG-level transforms (like the mobile rotation group).
  * @param {SVGSVGElement} svgEl - The root SVG element
  * @param {PointerEvent} e - The pointer event
- * @returns {{ x: number, y: number }} SVG-space coordinates
+ * @returns {{ x: number, y: number }} SVG-space coordinates in the content coordinate system
  */
 function clientToSVG(svgEl, e) {
-  const ctm = svgEl.getScreenCTM();
+  // Use a content group element for CTM to include any inner rotation transforms
+  const contentEl = svgEl.querySelector("#tokens-layer") || svgEl;
+  const ctm = contentEl.getScreenCTM ? contentEl.getScreenCTM() : null;
   if (ctm) {
     const pt = svgEl.createSVGPoint();
     pt.x = e.clientX;
@@ -33,14 +36,17 @@ function clientToSVG(svgEl, e) {
     return { x: svgPt.x, y: svgPt.y };
   }
 
-  // Fallback only if getScreenCTM is unavailable
-  const rect = svgEl.getBoundingClientRect();
-  const viewBox = svgEl.viewBox && svgEl.viewBox.baseVal;
-  const vbW = (viewBox && viewBox.width) || RINK_WIDTH;
-  const vbH = (viewBox && viewBox.height) || RINK_HEIGHT;
-  const x = (e.clientX - rect.left) * (vbW / rect.width);
-  const y = (e.clientY - rect.top) * (vbH / rect.height);
-  return { x, y };
+  // Fallback: try root SVG getScreenCTM
+  const rootCtm = svgEl.getScreenCTM ? svgEl.getScreenCTM() : null;
+  if (rootCtm) {
+    const pt = svgEl.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const svgPt = pt.matrixTransform(rootCtm.inverse());
+    return { x: svgPt.x, y: svgPt.y };
+  }
+
+  return { x: 0, y: 0 };
 }
 
 /**
