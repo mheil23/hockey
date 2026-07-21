@@ -211,7 +211,7 @@ function buildOpponentTokens(formation) {
     team: "opp",
     label: pos.label,
     nx: 1 - pos.nx,
-    ny: pos.ny,
+    ny: 1 - pos.ny,
     formationKey: pos.key,
   }));
 }
